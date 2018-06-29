@@ -15,16 +15,24 @@ Use keepalived with CDK to ensure kubeapi-load-balancer is not a single
 point of failure.
 
 ```
+# These instructions assume you've deployed CDK already:
+# juju deploy canonical-kubernetes
+
+# deploy the keepalived charm
 juju deploy keepalived
 
+# add new keepalived relations
 juju relate keepalived:juju-info kubeapi-load-balancer:juju-info
 juju relate keepalived:lb-sink kubeapi-load-balancer:website
 juju relate keepalived:loadbalancer kubernetes-master:loadbalancer
 juju relate keepalived:website kubernetes-worker:kube-api-endpoint
 
-# this relation is also needed as usual so that the actual
+# remove CDK relations that are no longer needed
+juju remove-relation kubernetes-worker:kube-api-endpoint kubeapi-load-balancer:website
+
+# NOTE: ensure this relation from CDK is preserved, so that the
 # load-balancer knows about backend endpoints
-juju relate kubernetes-master:kube-api-endpoint kubeapi-load-balancer:apiserver
+juju relate kubernetes-master:kube-api-endpoint kubeapi-load-balancer:apiserver || true
 
 # configure keepalived (values are examples, substitute your own)
 export VIP_HOSTNAME=test.example.com

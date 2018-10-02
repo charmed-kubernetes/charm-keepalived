@@ -7,7 +7,7 @@ those nodes, failing over when one goes down.
 ## Usage
 
 The Keepalived charm is a
-[subordinate](https://jujucharms.com/docs/stable/authors-subordinate-services).
+[subordinate](https://jujucharms.com/docs/stable/authors-subordinate-applications).
 
 ### Using with Kubernetes ([CDK](https://jujucharms.com/canonical-kubernetes))
 

@@ -48,6 +48,7 @@ juju config kubernetes-master extra_sans=$VIP_HOSTNAME
 juju add-unit kubeapi-load-balancer
 
 ```
+This changes kubelet and kubectl to use the VIP to reach the Kubernetes API server.
 
 ### Using with HA Proxy
 ```

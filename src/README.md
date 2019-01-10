@@ -29,6 +29,8 @@ juju relate keepalived:website kubernetes-worker:kube-api-endpoint
 
 # remove CDK relations that are no longer needed
 juju remove-relation kubernetes-worker:kube-api-endpoint kubeapi-load-balancer:website
+juju remove-relation kubernetes-master:loadbalancer kubeapi-load-balancer:loadbalancer
+
 
 # NOTE: ensure this relation from CDK is preserved, so that the
 # load-balancer knows about backend endpoints

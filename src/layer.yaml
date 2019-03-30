@@ -3,4 +3,3 @@ repo: https://github.com/juju-solutions/charm-keepalived.git
 options:
   basic:
     use_venv: true
-repo: "https://github.com/boucherv/charm-keepalived.git"

@@ -9,8 +9,9 @@ description: |
 tags:
   - "networking"
 series:
-  - "xenial"
-  - "bionic"
+  - bionic
+  - xenial
+  - focal
 subordinate: true
 requires:
   juju-info:

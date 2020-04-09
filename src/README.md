@@ -19,7 +19,7 @@ point of failure.
 # juju deploy canonical-kubernetes
 
 # deploy the keepalived charm
-juju deploy keepalived
+juju deploy cs:~containers/keepalived
 
 # add new keepalived relations
 juju relate keepalived:juju-info kubeapi-load-balancer:juju-info

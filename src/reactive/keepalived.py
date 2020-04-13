@@ -8,9 +8,10 @@ from charms.reactive.flags import clear_flag
 
 from charmhelpers.core.templating import render
 from charmhelpers.fetch import apt_update, apt_install
-from charmhelpers.core.hookenv import log, status_set
+from charmhelpers.core.hookenv import status_set
 from charmhelpers.core.hookenv import config, is_leader
 from charmhelpers.core.host import service_restart
+from charmhelpers.core.host import service_pause, service_resume
 
 
 SYSCTL_FILE = os.path.join(os.sep, 'etc', 'sysctl.d', '50-keepalived.conf')
@@ -28,6 +29,7 @@ def install_keepalived_package():
 
     set_flag('keepalived.package.installed')
 
+
 def default_route_interface():
     ''' Returns the network interface of the system's default route '''
     default_interface = None
@@ -38,8 +40,10 @@ def default_route_interface():
             default_interface = line.split(' ')[-1]
             return default_interface
 
+
 @when('keepalived.package.installed')
 @when_not('keepalived.started')
+@when_not('upgrade.series.in-progress')
 def configure_keepalived_service():
     ''' Set up the keepalived service '''
 
@@ -58,7 +62,7 @@ def configure_keepalived_service():
                'router_id': config().get('router_id'),
                'service_port': config().get('port'),
                'healthcheck_interval': config().get('healthcheck_interval'),
-              }
+               }
     render(source='keepalived.conf',
            target=KEEPALIVED_CONFIG_FILE,
            context=context,
@@ -102,4 +106,18 @@ def loadbalancer_available(loadbalancer):
 
 @hook('upgrade-charm')
 def upgrade_charm():
+    clear_flag('keepalived.started')
+
+
+@hook('pre-series-upgrade')
+def pre_series_upgrade():
+    service_pause('keepalived')
+    service_pause('procps')
+    status_set('blocked', 'Series upgrade in progress')
+
+
+@hook('post-series-upgrade')
+def post_series_upgrade():
+    service_resume('keepalived')
+    service_resume('procps')
     clear_flag('keepalived.started')

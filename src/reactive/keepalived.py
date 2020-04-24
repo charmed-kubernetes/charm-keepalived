@@ -8,10 +8,11 @@ from charms.reactive.flags import clear_flag
 
 from charmhelpers.core.templating import render
 from charmhelpers.fetch import apt_update, apt_install
-from charmhelpers.core.hookenv import status_set
 from charmhelpers.core.hookenv import config, is_leader
 from charmhelpers.core.host import service_restart
 from charmhelpers.core.host import service_pause, service_resume
+
+from charms.layer import status
 
 
 SYSCTL_FILE = os.path.join(os.sep, 'etc', 'sysctl.d', '50-keepalived.conf')
@@ -22,7 +23,7 @@ KEEPALIVED_CONFIG_FILE = os.path.join(os.sep, 'etc', 'keepalived',
 @when_not('keepalived.package.installed')
 def install_keepalived_package():
     ''' Install keepalived package '''
-    status_set('maintenance', 'Installing keepalived')
+    status.maintenance('Installing keepalived')
 
     apt_update(fatal=True)
     apt_install('keepalived', fatal=True)
@@ -49,7 +50,7 @@ def configure_keepalived_service():
 
     virtual_ip = config().get('virtual_ip')
     if virtual_ip == "":
-        status_set('blocked', 'Please configure virtual ips')
+        status.blocked('Please configure virtual ips')
         return
 
     network_interface = config().get('network_interface')
@@ -75,7 +76,7 @@ def configure_keepalived_service():
            perms=0o644)
     service_restart('procps')
 
-    status_set('active', 'VIP ready')
+    status.active('VIP ready')
     set_flag('keepalived.started')
 
 
@@ -113,7 +114,7 @@ def upgrade_charm():
 def pre_series_upgrade():
     service_pause('keepalived')
     service_pause('procps')
-    status_set('blocked', 'Series upgrade in progress')
+    status.blocked('Series upgrade in progress')
 
 
 @hook('post-series-upgrade')

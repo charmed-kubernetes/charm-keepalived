@@ -1,4 +1,4 @@
-includes: ['layer:basic', 'interface:juju-info', 'interface:public-address', 'interface:http']
+includes: ['layer:basic', 'interface:juju-info', 'interface:public-address', 'interface:http', 'layer:status']
 repo: https://github.com/juju-solutions/charm-keepalived.git
 options:
   basic:

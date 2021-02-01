@@ -22,7 +22,7 @@ We have adopted the Ubuntu code of Conduct. You can read this in full [here](htt
 
 ## Contributing code
 
-To contribute code to this project, pleas euse the following workflow:
+To contribute code to this project, please use the following workflow:
 
 1. [Submit a bug](https://bugs.launchpad.net/charm-keepalived/+filebug) to explain the need for and track the change.
 2. Create a branch on your fork of the repo with your changes, including a unit test covering the new or modified code.

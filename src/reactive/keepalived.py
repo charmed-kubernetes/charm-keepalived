@@ -26,7 +26,7 @@ def install_keepalived_package():
     status.maintenance('Installing keepalived')
 
     apt_update(fatal=True)
-    apt_install('keepalived', fatal=True)
+    apt_install(['keepalived', 'net-tools'], fatal=True)
 
     set_flag('keepalived.package.installed')
 

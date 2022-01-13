@@ -11,7 +11,7 @@ log = logging.getLogger(__name__)
 def _check_status_messages(ops_test):
     """Validate that the status messages are correct."""
     expected_messages = {
-        "kubernetes-master": "Kubernetes master running.",
+        "kubernetes-control-plane": "Kubernetes master running.",
         "kubernetes-worker": "Kubernetes worker running.",
         "keepalived": "Please configure virtual ips",
     }
@@ -49,9 +49,9 @@ async def test_build_and_deploy(ops_test):
             ),
         )
     except asyncio.TimeoutError:
-        if "kubernetes-master" not in ops_test.model.applications:
+        if "kubernetes-control-plane" not in ops_test.model.applications:
             raise
-        app = ops_test.model.applications["kubernetes-master"]
+        app = ops_test.model.applications["kubernetes-control-plane"]
         if not app.units:
             raise
         unit = app.units[0]

@@ -53,7 +53,7 @@ applications:
     resources: {}
     to:
     - '2'
-  kubernetes-master:
+  kubernetes-control-plane:
     charm: cs:~containers/kubernetes-master
     channel: edge
     constraints: cores=4 mem=4G root-disk=16G
@@ -90,17 +90,17 @@ applications:
     to:
       - '1'
 relations:
-- - kubernetes-master:loadbalancer-external
+- - kubernetes-control-plane:loadbalancer-external
   - kubeapi-load-balancer:lb-consumers
-- - kubernetes-master:loadbalancer-internal
+- - kubernetes-control-plane:loadbalancer-internal
   - kubeapi-load-balancer:lb-consumers
-- - kubernetes-master:kube-control
+- - kubernetes-control-plane:kube-control
   - kubernetes-worker:kube-control
-- - kubernetes-master:certificates
+- - kubernetes-control-plane:certificates
   - easyrsa:client
 - - etcd:certificates
   - easyrsa:client
-- - kubernetes-master:etcd
+- - kubernetes-control-plane:etcd
   - etcd:db
 - - kubernetes-worker:certificates
   - easyrsa:client
@@ -109,21 +109,21 @@ relations:
 - - flannel:etcd
   - etcd:db
 - - flannel:cni
-  - kubernetes-master:cni
+  - kubernetes-control-plane:cni
 - - flannel:cni
   - kubernetes-worker:cni
 - - containerd:containerd
   - kubernetes-worker:container-runtime
 - - containerd:containerd
-  - kubernetes-master:container-runtime
+  - kubernetes-control-plane:container-runtime
 #######################################
 - - keepalived:juju-info
   - kubeapi-load-balancer:juju-info
 - - keepalived:lb-sink
   - kubeapi-load-balancer:website
 - - keepalived:loadbalancer
-  - kubernetes-master:loadbalancer
+  - kubernetes-control-plane:loadbalancer
 - - keepalived:website
   - kubernetes-worker:kube-api-endpoint
 - - kubeapi-load-balancer:apiserver
-  - kubernetes-master:kube-api-endpoint
+  - kubernetes-control-plane:kube-api-endpoint

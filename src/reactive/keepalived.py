@@ -32,7 +32,6 @@ def install_keepalived_package():
 
 def default_route_interface():
     """Returns the network interface of the system's default route"""
-    default_interface = None
     cmd = ["route"]
     output = check_output(cmd).decode("utf8")
     for line in output.split("\n"):
@@ -125,4 +124,5 @@ def pre_series_upgrade():
 def post_series_upgrade():
     service_resume("keepalived")
     service_resume("procps")
+    clear_flag("keepalived.package.installed")
     clear_flag("keepalived.started")

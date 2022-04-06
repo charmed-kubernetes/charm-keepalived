@@ -6,6 +6,7 @@ maintainers:
 description: |
   keepalived is used for monitoring real servers within a Linux Virtual
   Server (LVS) cluster.
+docs: https://discourse.charmhub.io/t/keepalived-docs-index/6043
 tags:
   - "networking"
 series:

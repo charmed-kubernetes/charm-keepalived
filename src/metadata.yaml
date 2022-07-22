@@ -11,8 +11,8 @@ tags:
   - "networking"
 series:
   - focal
+  - jammy
   - bionic
-  - xenial
 subordinate: true
 requires:
   juju-info:

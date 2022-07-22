@@ -2,45 +2,23 @@ name: Test Suite
 on: [pull_request]
 
 jobs:
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python: [3.6, 3.7, 3.8, 3.9]
-    steps:
-    - name: Check out code
-      uses: actions/checkout@v2
-    - name: Setup Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python }}
-    - name: Install Dependencies
-      run: |
-        pip install tox
-    - name: Run lint
-      run: tox -vve lint
-  unit-test:
-    name: Unit Tests
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python: [3.6, 3.7, 3.8, 3.9]
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v2
-      - name: Setup Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python }}
-      - name: Install Dependencies
-        run: |
-          pip install tox
-      - name: Run test
-        run: tox -vve unit
+  call-inclusive-naming-check:
+    name: Inclusive Naming
+    uses: canonical-web-and-design/Inclusive-naming/.github/workflows/woke.yaml@main
+    with:
+      fail-on-error: "true"
+
+  lint-unit:
+    name: Lint Unit
+    uses: charmed-kubernetes/workflows/.github/workflows/lint-unit.yaml@main
+    needs: 
+      - call-inclusive-naming-check
+
   integration-test:
     name: Integration test with VMWare
     runs-on: self-hosted
+    needs: 
+      - lint-unit
     timeout-minutes: 360
     steps:
       - name: Check out code

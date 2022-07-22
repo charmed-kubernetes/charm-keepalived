@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import shlex
+from pathlib import Path
 import yaml
 
 import pytest
@@ -11,7 +12,7 @@ log = logging.getLogger(__name__)
 def _check_status_messages(ops_test):
     """Validate that the status messages are correct."""
     expected_messages = {
-        "kubernetes-control-plane": "Kubernetes master running.",
+        "kubernetes-control-plane": "Kubernetes control-plane running.",
         "kubernetes-worker": "Kubernetes worker running.",
         "keepalived": "Please configure virtual ips",
     }
@@ -21,16 +22,24 @@ def _check_status_messages(ops_test):
 
 
 @pytest.mark.abort_on_fail
-async def test_build_and_deploy(ops_test):
+async def test_build_and_deploy(series, ops_test):
     log.info("Build Charm...")
     charm = await ops_test.build_charm("src")
 
+    context = dict(charm=charm, series=series)
+    overlays = [
+        ops_test.Bundle("kubernetes-core", channel="edge"),
+        Path("tests/data/bundle.yaml"),
+    ]
+
     log.info("Build Bundle...")
-    bundle = ops_test.render_bundle("tests/data/bundle.yaml", keepalived_charm=charm)
+    bundle, *overlays = await ops_test.async_render_bundles(*overlays, **context)
 
     log.info("Deploy Bundle...")
     model = ops_test.model_full_name
-    cmd = f"juju deploy -m {model} {bundle}"
+    cmd = f"juju deploy -m {model} {bundle} " + " ".join(
+        f"--overlay={f}" for f in overlays
+    )
     rc, stdout, stderr = await ops_test.run(*shlex.split(cmd))
     assert rc == 0, f"Bundle deploy failed: {(stderr or stdout).strip()}"
 
@@ -38,8 +47,12 @@ async def test_build_and_deploy(ops_test):
     await ops_test.model.block_until(
         lambda: "keepalived" in ops_test.model.applications, timeout=60
     )
-    apps = list(yaml.safe_load(bundle.open())["applications"])
-    apps.remove("keepalived")
+    apps = [
+        app
+        for fragment in (bundle, *overlays)
+        for app in yaml.safe_load(fragment.open())["applications"]
+        if app != "keepalived"
+    ]
 
     try:
         await asyncio.gather(

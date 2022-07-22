@@ -1,114 +1,27 @@
-description: A minimal Kubernetes cluster to enable development with keepalived
-series: &series {{series|default("focal")}}
-machines:
-  '0':
-    constraints: cores=4 mem=4G root-disk=16G
-    series: *series
-  '1':
-    constraints: cores=4 mem=4G root-disk=16G
-    series: *series
-  '2':
-    constraints: cores=2 mem=2G root-disk=8G
-    series: *series
+description: A minimal overlay atop kubernetes-core to enable development with keepalived
+series: {{series}}
 applications:
-  containerd:
-    charm: cs:~containers/containerd
-    channel: edge
-    resources: {}
-  easyrsa:
-    charm: cs:~containers/easyrsa
-    channel: edge
-    num_units: 1
-    resources:
-      easyrsa: 5
-    to:
-    - '1'
-  etcd:
-    charm: cs:~containers/etcd
-    channel: edge
-    num_units: 1
-    options:
-      channel: 3.4/stable
-    resources:
-      core: 0
-      etcd: 3
-      snapshot: 0
-    to:
-    - '0'
-  flannel:
-    charm: cs:~containers/flannel
-    channel: edge
-    resources:
-      flannel-amd64: 897
-      flannel-arm64: 894
-      flannel-s390x: 881
   keepalived:
-    charm: {{keepalived_charm}}
+    charm: {{charm}}
   kubeapi-load-balancer:
-    charm: cs:~containers/kubeapi-load-balancer
+    charm: kubeapi-load-balancer
     channel: edge
     constraints: mem=4G root-disk=8G
     expose: true
     num_units: 1
-    resources: {}
-    to:
-    - '2'
-  kubernetes-control-plane:
-    charm: kubernetes-control-plane
-    channel: latest/edge
-    constraints: cores=4 mem=4G root-disk=16G
-    expose: true
-    num_units: 1
-    options:
-      channel: 1.23/edge
-    to:
-    - '0'
-  kubernetes-worker:
-    charm: cs:~containers/kubernetes-worker
-    channel: edge
-    constraints: cores=4 mem=4G root-disk=16G
-    expose: true
-    num_units: 1
-    options:
-      channel: 1.23/edge
-    resources:
-      cni-amd64: 933
-      cni-arm64: 924
-      cni-s390x: 936
-      core: 0
-      kube-proxy: 0
-      kubectl: 0
-      kubelet: 0
-    to:
-      - '1'
 relations:
+#######################################
+#  Kubeapi-load-balancer relations
+- - kubeapi-load-balancer:apiserver
+  - kubernetes-control-plane:kube-api-endpoint
 - - kubernetes-control-plane:loadbalancer-external
   - kubeapi-load-balancer:lb-consumers
 - - kubernetes-control-plane:loadbalancer-internal
   - kubeapi-load-balancer:lb-consumers
-- - kubernetes-control-plane:kube-control
-  - kubernetes-worker:kube-control
-- - kubernetes-control-plane:certificates
-  - easyrsa:client
-- - etcd:certificates
-  - easyrsa:client
-- - kubernetes-control-plane:etcd
-  - etcd:db
-- - kubernetes-worker:certificates
-  - easyrsa:client
 - - kubeapi-load-balancer:certificates
   - easyrsa:client
-- - flannel:etcd
-  - etcd:db
-- - flannel:cni
-  - kubernetes-control-plane:cni
-- - flannel:cni
-  - kubernetes-worker:cni
-- - containerd:containerd
-  - kubernetes-worker:container-runtime
-- - containerd:containerd
-  - kubernetes-control-plane:container-runtime
 #######################################
+#  keepalived relations
 - - keepalived:juju-info
   - kubeapi-load-balancer:juju-info
 - - keepalived:lb-sink
@@ -117,5 +30,3 @@ relations:
   - kubernetes-control-plane:loadbalancer
 - - keepalived:website
   - kubernetes-worker:kube-api-endpoint
-- - kubeapi-load-balancer:apiserver
-  - kubernetes-control-plane:kube-api-endpoint

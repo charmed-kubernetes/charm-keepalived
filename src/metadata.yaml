@@ -10,9 +10,8 @@ docs: https://discourse.charmhub.io/t/keepalived-docs-index/6043
 tags:
   - "networking"
 series:
-  - focal
   - jammy
-  - bionic
+  - focal
 subordinate: true
 requires:
   juju-info:

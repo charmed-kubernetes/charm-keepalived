@@ -1,0 +1,20 @@
+type: charm
+
+parts:
+  charm:
+    plugin: dump
+    source: ./src
+    plugin: reactive
+    build-snaps: [charm]
+    build-packages:
+      - python3-dev
+      - libpython3-dev
+bases:
+    - build-on:
+        - name: ubuntu
+          channel: "22.04"
+      run-on:
+        - name: ubuntu
+          channel: "22.04"
+        - name: ubuntu
+          channel: "20.04"

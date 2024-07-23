@@ -1,9 +1,4 @@
 type: "charm"
-  # name: "keepalived"
-  # summary: "Failover and monitoring daemon for LVS clusters"
-  # description: |
-  #   keepalived is used for monitoring real servers within a Linux Virtual
-  #   Server (LVS) cluster.
 bases:
   - build-on:
       - name: "ubuntu"

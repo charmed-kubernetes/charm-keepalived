@@ -13,6 +13,8 @@ jobs:
     uses: charmed-kubernetes/workflows/.github/workflows/lint-unit.yaml@main
     needs: 
       - call-inclusive-naming-check
+    with:
+      python: "['3.8', '3.10', '3.12']"
 
   integration-test:
     name: Integration test with VMWare

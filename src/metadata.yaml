@@ -1,4 +1,5 @@
 name: "keepalived"
+display-name: "Keepalived"
 summary: "Failover and monitoring daemon for LVS clusters"
 maintainers:
   - "Konstantinos Tsakalozos <kos.tsakalozos@canonical.com>"
@@ -13,6 +14,10 @@ series:
   - noble
   - jammy
   - focal
+
+assumes:
+  - juju >= 3.4
+
 subordinate: true
 requires:
   juju-info:

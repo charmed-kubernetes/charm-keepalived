@@ -2,9 +2,9 @@ import asyncio
 import logging
 import shlex
 from pathlib import Path
-import yaml
 
 import pytest
+from pytest_operator.plugin import OpsTest
 
 log = logging.getLogger(__name__)
 
@@ -12,8 +12,8 @@ log = logging.getLogger(__name__)
 def _check_status_messages(ops_test):
     """Validate that the status messages are correct."""
     expected_messages = {
-        "kubernetes-control-plane": "Kubernetes control-plane running.",
-        "kubernetes-worker": "Kubernetes worker running.",
+        "kubernetes-control-plane": "Ready",
+        "kubernetes-worker": "Ready",
         "keepalived": "Please configure virtual ips",
     }
     for app, message in expected_messages.items():
@@ -22,7 +22,7 @@ def _check_status_messages(ops_test):
 
 
 @pytest.mark.abort_on_fail
-async def test_build_and_deploy(series, ops_test):
+async def test_build_and_deploy(series, ops_test: OpsTest):
     log.info("Build Charm...")
     charm = await ops_test.build_charm("src")
 
@@ -37,29 +37,20 @@ async def test_build_and_deploy(series, ops_test):
 
     log.info("Deploy Bundle...")
     model = ops_test.model_full_name
-    cmd = f"juju deploy -m {model} {bundle} " + " ".join(
-        f"--overlay={f}" for f in overlays
-    )
-    rc, stdout, stderr = await ops_test.run(*shlex.split(cmd))
-    assert rc == 0, f"Bundle deploy failed: {(stderr or stdout).strip()}"
+    overlays = " ".join(f"--overlay={f}" for f in overlays)
+    cmd = f"juju deploy -m {model} {bundle} {overlays}"
+    await ops_test.run(*shlex.split(cmd), check=True, fail_msg="Bundle deploy failed")
 
-    log.info(stdout)
     await ops_test.model.block_until(
         lambda: "keepalived" in ops_test.model.applications, timeout=60
     )
-    apps = [
-        app
-        for fragment in (bundle, *overlays)
-        for app in yaml.safe_load(fragment.open())["applications"]
-        if app != "keepalived"
-    ]
+    apps = [app for app in ops_test.model.applications if app != "keepalived"]
+    hour = 60 * 60
 
     try:
         await asyncio.gather(
-            ops_test.model.wait_for_idle(apps=["keepalived"], timeout=60 * 60),
-            ops_test.model.wait_for_idle(
-                apps=apps, wait_for_active=True, timeout=60 * 60
-            ),
+            ops_test.model.wait_for_idle(apps=["keepalived"], timeout=hour),
+            ops_test.model.wait_for_idle(apps=apps, status="active", timeout=hour),
         )
     except asyncio.TimeoutError:
         if "kubernetes-control-plane" not in ops_test.model.applications:

@@ -1,22 +1,18 @@
-name: "keepalived"
-display-name: "Keepalived"
-summary: "Failover and monitoring daemon for LVS clusters"
+name: keepalived
+display-name: Keepalived
+summary: Failover and monitoring daemon for LVS clusters
 maintainers:
-  - "Konstantinos Tsakalozos <kos.tsakalozos@canonical.com>"
-  - "Valentin Boucher <valentin.boucher@kontron.com>"
+- "Konstantinos Tsakalozos <kos.tsakalozos@canonical.com>"
+- "Valentin Boucher <valentin.boucher@kontron.com>"
 description: |
   keepalived is used for monitoring real servers within a Linux Virtual
   Server (LVS) cluster.
 docs: https://discourse.charmhub.io/t/keepalived-docs-index/6043
 tags:
-  - "networking"
-series:
-  - noble
-  - jammy
-  - focal
+- networking
 
 assumes:
-  - juju >= 3.4
+- juju >= 3.4
 
 subordinate: true
 requires:
@@ -24,9 +20,9 @@ requires:
     scope: container
     interface: juju-info
   lb-sink:
-    interface: "http"
+    interface: http
 provides:
   loadbalancer:
-    interface: "public-address"
+    interface: public-address
   website:
-    interface: "http"
+    interface: http

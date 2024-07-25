@@ -21,7 +21,4 @@ parts:
     source: .
     plugin: reactive
     build-snaps: [charm]
-    build-packages:
-      - python3-dev
-      - libpython3-dev
 

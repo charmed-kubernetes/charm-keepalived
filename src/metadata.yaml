@@ -11,9 +11,6 @@ docs: https://discourse.charmhub.io/t/keepalived-docs-index/6043
 tags:
 - networking
 
-assumes:
-- juju >= 3.4
-
 subordinate: true
 requires:
   juju-info:

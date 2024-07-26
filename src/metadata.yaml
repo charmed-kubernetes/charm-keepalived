@@ -10,7 +10,10 @@ description: |
 docs: https://discourse.charmhub.io/t/keepalived-docs-index/6043
 tags:
 - networking
-
+series:
+- noble
+- jammy
+- focal
 subordinate: true
 requires:
   juju-info:

@@ -12,21 +12,9 @@ applications:
 relations:
 #######################################
 #  Kubeapi-load-balancer relations
-- - kubeapi-load-balancer:apiserver
-  - kubernetes-control-plane:kube-api-endpoint
-- - kubernetes-control-plane:loadbalancer-external
-  - kubeapi-load-balancer:lb-consumers
-- - kubernetes-control-plane:loadbalancer-internal
-  - kubeapi-load-balancer:lb-consumers
-- - kubeapi-load-balancer:certificates
-  - easyrsa:client
+- [kubernetes-control-plane:loadbalancer-external, kubeapi-load-balancer:lb-consumers]
+- [kubernetes-control-plane:loadbalancer-internal, kubeapi-load-balancer:lb-consumers]
+- [kubeapi-load-balancer:certificates,             easyrsa:client]
 #######################################
 #  keepalived relations
-- - keepalived:juju-info
-  - kubeapi-load-balancer:juju-info
-- - keepalived:lb-sink
-  - kubeapi-load-balancer:website
-- - keepalived:loadbalancer
-  - kubernetes-control-plane:loadbalancer
-- - keepalived:website
-  - kubernetes-worker:kube-api-endpoint
+- [keepalived:juju-info,    kubeapi-load-balancer:juju-info]

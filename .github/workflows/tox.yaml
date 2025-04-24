@@ -16,25 +16,32 @@ jobs:
   lint-unit:
     name: Lint Unit
     uses: charmed-kubernetes/workflows/.github/workflows/lint-unit.yaml@main
-    needs: 
+    needs:
       - call-inclusive-naming-check
     with:
-      python: "['3.8', '3.10', '3.12']"
+      python: "['3.10', '3.12']"
 
   integration-test:
     name: Integration test with VMWare
     runs-on: self-hosted
-    needs: 
+    needs:
       - lint-unit
     timeout-minutes: 360
     steps:
       - name: Check out code
         uses: actions/checkout@v4
+      - id: charmcraft
+        run: echo "channel=$(cat .charmcraft-channel)" >> $GITHUB_OUTPUT
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
       - name: Setup operator environment
         uses: charmed-kubernetes/actions-operator@main
         with:
           provider: vsphere
           juju-channel: 3/stable
+          charmcraft-channel: ${{ steps.charmcraft.outputs.channel }}
           credentials-yaml: ${{ secrets.CREDENTIALS_YAML }}
           clouds-yaml: ${{ secrets.CLOUDS_YAML }}
           bootstrap-constraints: "arch=amd64 cores=2 mem=4G"

@@ -24,7 +24,7 @@ def _check_status_messages(ops_test):
 @pytest.mark.abort_on_fail
 async def test_build_and_deploy(series, ops_test: OpsTest):
     log.info("Build Charm...")
-    charm = await ops_test.build_charm("src")
+    charm = await ops_test.build_charm(".")
 
     context = dict(charm=charm, series=series)
     overlays = [

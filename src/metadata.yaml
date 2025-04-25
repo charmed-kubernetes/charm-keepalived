@@ -13,7 +13,6 @@ tags:
 series:
 - noble
 - jammy
-- focal
 subordinate: true
 requires:
   juju-info:
